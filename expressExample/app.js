@@ -1,4 +1,4 @@
-//sama
+
 var express = require('express');
 var path = require('path');
 const { render } = require('ejs');
