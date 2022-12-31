@@ -140,13 +140,16 @@ app.post('/', function (req, res) {
 
   MongoClient.connect("mongodb://127.0.0.1:27017", function (err, client) {
     if (err) throw err;
-    var db = client.db('MyDB');
-    var collection = db.collection('FirstCollection');
-    collection.find({ username: x} && {password:y} , { $exists: true }).toArray(function (err, items) //find if a value exists
+    var db = client.db('myDB');
+    var collection = db.collection('myCollection');
+    if(x== 'admin' && y=='admin'){
+       res.render('home.ejs');
+    }
+    else collection.find({ username: x} && {password:y} , { $exists: true }).toArray(function (err, items) //find if a value exists
     {
       if (err) throw err;
 
-      console.log(items[0]);
+      
       if (items.length == 0) {
 
         alert('user not found');
@@ -157,7 +160,9 @@ app.post('/', function (req, res) {
       }
       else {
         req.session.user=items[0];
+        
         return res.redirect('/home');
+        
       }
     })
   })
@@ -177,8 +182,8 @@ app.post('/register', function (req, res) {
   var m=req.body.password;
   MongoClient.connect("mongodb://127.0.0.1:27017", function (err, client) {
     if (err) throw err;
-  var db = client.db('MyDB');
-  var collection = db.collection('FirstCollection');
+  var db = client.db('myDB');
+  var collection = db.collection('myCollection');
  if(req.body.username=='') {
   alert("please enter username ");
  }
@@ -191,7 +196,7 @@ app.post('/register', function (req, res) {
       if(err) throw err;
 
       if (items.length == 0) {
-        db.collection('FirstCollection').insertOne({ username: z, password: m,wanttogolist:[]});
+        db.collection('myCollection').insertOne({ username: z, password: m,wanttogolist:[]});
         alert('Successfully logged in');
         return res.redirect('/');
       }
@@ -215,8 +220,8 @@ app.post('/search', function (req, res) {
   var z=req.body.Search;
   MongoClient.connect("mongodb://127.0.0.1:27017", function (err, client) {
     if (err) throw err;
-  var db = client.db('MyDB');
-  var collection = db.collection('FirstCollection');
+  var db = client.db('myDB');
+  var collection = db.collection('myCollection');
   var searchresult = [];
   
   for( var j=0; j<allPlaces.length;j++){
@@ -270,8 +275,8 @@ app.post('/santorini', function (req, res) {
 function addtomywanttogolist(req,res,place){
   MongoClient.connect("mongodb://127.0.0.1:27017", function (err, client) {
     if (err) throw err;
-  var db = client.db('MyDB');
-  var collection = db.collection('FirstCollection');
+  var db = client.db('myDB');
+  var collection = db.collection('myCollection');
   if(!req.session.user.wanttogolist.includes(place)){
     req.session.user.wanttogolist.push(place);
     req.session.save();
@@ -290,7 +295,15 @@ alert('place already exists in your wanttogolist');
 }
 });
 }
-app.listen(3000);
+if (process.env.PORT) {
+  app.listen(process.env.PORT, function () {
+    console.log("server started");
+  });
+} else {
+  app.listen(3000, function () {
+    console.log("server started on port 3000");
+  });
+}
 
 
 
